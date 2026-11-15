@@ -16,7 +16,10 @@ Notes discovered while building this:
         sub_status   closed_expired  -> closed, nobody awarded
                                         ("No freelancer selected" on the site)
                      closed_awarded  -> a freelancer was awarded
-                     frozen_*        -> awarded, freelancer did not accept / timed out
+                     frozen_timeout  -> bidding period ended, nobody awarded; Freelancer
+                                        later turns these into closed_expired, so they
+                                        count as "no freelancer selected"
+                     frozen_awarded  -> awarded, waiting for the freelancer to accept
                      cancel_buyer / cancel_seller / cancel_admin -> cancelled
                      (empty while the project is still open)
 
@@ -48,9 +51,9 @@ def classify(p: dict) -> str:
     """Collapse raw status/sub_status into analysis groups."""
     sub = (p.get("sub_status") or "").lower()
     status = (p.get("status") or "").lower()
-    if sub == "closed_expired":
+    if sub in ("closed_expired", "frozen_timeout"):
         return "no_freelancer_selected"
-    if sub == "closed_awarded" or status == "frozen" or sub.startswith("frozen"):
+    if sub == "closed_awarded" or sub.startswith("frozen") or status == "frozen":
         return "awarded"
     if sub.startswith("cancel"):
         return "cancelled"
@@ -122,60 +125,122 @@ def daterange(a: dt.date, b: dt.date):
         d += dt.timedelta(days=1)
 
 
-def summarise(by_job: dict[str, list[dict]]) -> dict:
+PRETTY = {"data_analysis": "Data Analysis", "graphic_design": "Graphic Design"}
+
+
+def summarise(by_job: dict[str, list[dict]], end: dt.date, settle_days: int = 14) -> dict:
+    """Totals per category. 'settled' covers months that ended at least
+    `settle_days` before `end`, so nearly all their projects have a final status."""
     out = {}
     for name, rows in by_job.items():
-        g = Counter(r["group"] for r in rows)
-        total = sum(g.values())
-        finished = total - g["still_open"]
-        monthly = defaultdict(Counter)
+        monthly, by_type = defaultdict(Counter), defaultdict(Counter)
         for r in rows:
             monthly[r["time_submitted"][:7]][r["group"]] += 1
-        out[name] = {
-            "projects": total,
-            "groups": dict(g),
-            "pct_no_freelancer_of_all": round(100 * g["no_freelancer_selected"] / total, 2) if total else None,
-            "pct_no_freelancer_of_finished": round(100 * g["no_freelancer_selected"] / finished, 2) if finished else None,
-            "pct_awarded_of_finished": round(100 * g["awarded"] / finished, 2) if finished else None,
-            "monthly": {m: dict(c) for m, c in sorted(monthly.items())},
-        }
+            by_type[r["type"]][r["group"]] += 1
+        out[name] = summarise_counts(dict(monthly), dict(by_type), end, settle_days)
     return out
 
 
+def summarise_counts(monthly: dict, by_type: dict, end: dt.date, settle_days: int = 14) -> dict:
+    def stats(c: Counter) -> dict:
+        c = Counter(c)
+        total = sum(c.values())
+        fin = total - c["still_open"]
+        return {
+            "projects": total, "finished": fin, "groups": dict(c),
+            "pct_no_freelancer": round(100 * c["no_freelancer_selected"] / fin, 1) if fin else None,
+            "pct_awarded": round(100 * c["awarded"] / fin, 1) if fin else None,
+            "pct_cancelled": round(100 * c["cancelled"] / fin, 1) if fin else None,
+        }
+
+    def month_end(m: str) -> dt.date:
+        y, mo = map(int, m.split("-"))
+        return dt.date(y + (mo == 12), mo % 12 + 1, 1) - dt.timedelta(days=1)
+
+    settled_months = [m for m in sorted(monthly) if month_end(m) <= end - dt.timedelta(days=settle_days)]
+    all_c, settled_c = Counter(), Counter()
+    for m, c in monthly.items():
+        all_c.update(c)
+        if m in settled_months:
+            settled_c.update(c)
+    return {
+        "all": stats(all_c),
+        "settled": stats(settled_c),
+        "settled_months": [settled_months[0], settled_months[-1]] if settled_months else None,
+        "monthly": {m: stats(c) for m, c in sorted(monthly.items())},
+        "by_type": {t: stats(c) for t, c in sorted(by_type.items())},
+    }
+
+
 def write_report(summary: dict, start: dt.date, end: dt.date, path: str) -> None:
+    names = list(summary)
+    label = lambda n: PRETTY.get(n, n)
+    first = next(iter(summary.values()))
+    sm = first["settled_months"]
     lines = [
         "# Freelancer.com: projects with no freelancer selected",
         "",
         f"Projects posted {start} – {end} (UTC). Generated {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M} UTC.",
         "",
-        "| Category | Projects | No freelancer selected | Awarded | Cancelled | Still open | % no freelancer (of finished) | % no freelancer (of all) |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for name, s in summary.items():
-        g = s["groups"]
-        lines.append(
-            f"| {name} | {s['projects']} | {g.get('no_freelancer_selected', 0)} | {g.get('awarded', 0)} | "
-            f"{g.get('cancelled', 0)} | {g.get('still_open', 0)} | {s['pct_no_freelancer_of_finished']}% | "
-            f"{s['pct_no_freelancer_of_all']}% |"
-        )
+    if sm:
+        lines += [
+            f"## Headline: projects posted {sm[0]} to {sm[1]} (months whose projects have all finished)",
+            "",
+            "| Category | Projects | No freelancer selected | Awarded | Cancelled | **% no freelancer selected** |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+        for n, s in summary.items():
+            t = s["settled"]; g = t["groups"]
+            lines.append(f"| {label(n)} | {t['projects']:,} | {g.get('no_freelancer_selected', 0):,} | "
+                         f"{t['pct_awarded']}% | {t['pct_cancelled']}% | **{t['pct_no_freelancer']}%** |")
+        lines.append("")
+    lines += [
+        "## Whole period, including the latest month (provisional)",
+        "",
+        "| Category | Projects | Still open | No freelancer selected | % no freelancer (of finished) |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for n, s in summary.items():
+        t = s["all"]; g = t["groups"]
+        lines.append(f"| {label(n)} | {t['projects']:,} | {g.get('still_open', 0):,} | "
+                     f"{g.get('no_freelancer_selected', 0):,} | {t['pct_no_freelancer']}% |")
     lines += [
         "",
-        "*Finished* = projects no longer open (no freelancer selected + awarded + cancelled + other).",
-        "Status `closed_expired` is counted as *no freelancer selected*; `closed_awarded` and `frozen*` as *awarded*.",
+        "## By month (% of finished projects with no freelancer selected)",
         "",
-        "## Monthly share of finished projects with no freelancer selected",
-        "",
-        "| Month | " + " | ".join(summary) + " |",
-        "|---|" + "---:|" * len(summary),
+        "| Month | " + " | ".join(label(n) for n in names) + " |",
+        "|---|" + "---:|" * len(names),
     ]
     months = sorted({m for s in summary.values() for m in s["monthly"]})
     for m in months:
         cells = []
         for s in summary.values():
-            c = s["monthly"].get(m, {})
-            fin = sum(c.values()) - c.get("still_open", 0)
-            cells.append(f"{100 * c.get('no_freelancer_selected', 0) / fin:.1f}% (n={fin})" if fin else "–")
-        lines.append(f"| {m} | " + " | ".join(cells) + " |")
+            t = s["monthly"].get(m)
+            cells.append(f"{t['pct_no_freelancer']}% (n={t['finished']:,})" if t and t["finished"] else "–")
+        flag = "" if sm and m <= sm[1] else " *(provisional)*"
+        lines.append(f"| {m}{flag} | " + " | ".join(cells) + " |")
+    lines += [
+        "",
+        "## By project type (whole period)",
+        "",
+        "| Type | " + " | ".join(label(n) for n in names) + " |",
+        "|---|" + "---:|" * len(names),
+    ]
+    types = sorted({t for s in summary.values() for t in s["by_type"]})
+    for ty in types:
+        cells = []
+        for s in summary.values():
+            t = s["by_type"].get(ty)
+            cells.append(f"{t['pct_no_freelancer']}% (n={t['finished']:,})" if t and t["finished"] else "–")
+        lines.append(f"| {ty} | " + " | ".join(cells) + " |")
+    lines += [
+        "",
+        "Percentages are of *finished* projects (no freelancer selected + awarded + cancelled); projects still open are left out.",
+        "",
+        "Status mapping: `closed_expired` and `frozen_timeout` (bidding ended, nobody awarded) = *no freelancer selected*;",
+        "`closed_awarded` and `frozen_awarded` = *awarded*; `cancel_*` = *cancelled*; `active` = *still open*.",
+    ]
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -229,11 +294,11 @@ def main() -> int:
                 w.writerows(rows)
         print(f"{name}: {len(rows)} projects -> {path}")
 
-    summary = summarise(rows_by_job)
+    summary = summarise(rows_by_job, end)
     with open(os.path.join(a.out, "summary.json"), "w", encoding="utf-8") as f:
         json.dump({"start": str(start), "end": str(end), "categories": summary}, f, indent=2)
     write_report(summary, start, end, "RESULTS.md")
-    print(json.dumps({k: {x: v[x] for x in ("projects", "pct_no_freelancer_of_finished")} for k, v in summary.items()}))
+    print(json.dumps({k: {"settled": v["settled"]["pct_no_freelancer"], "all": v["all"]["pct_no_freelancer"]} for k, v in summary.items()}))
     return 0
 
 

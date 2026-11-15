@@ -15,15 +15,15 @@ Status mapping:
 
 | API `sub_status` | Group |
 |---|---|
-| `closed_expired` | **no freelancer selected** (bidding closed, nobody awarded) |
-| `closed_awarded`, `frozen*` | awarded |
+| `closed_expired`, `frozen_timeout` | **no freelancer selected** (bidding ended, nobody awarded; `frozen_timeout` is the interim status before Freelancer marks a project `closed_expired`) |
+| `closed_awarded`, `frozen_awarded` | awarded |
 | `cancel_buyer`, `cancel_seller`, `cancel_admin` | cancelled |
 | empty / `active` | still open (excluded from the "of finished" percentage) |
 
 Outputs:
 - `data/projects_<category>.csv` — one row per project (id, date, title, type, status, bids, budget, URL)
 - `data/summary.json` — totals and monthly counts
-- `RESULTS.md` — the summary tables
+- `RESULTS.md` — the summary tables. The headline uses only months that ended at least 14 days before the run, so their projects have a final status; the latest month is marked provisional.
 
 ## Run locally
 
