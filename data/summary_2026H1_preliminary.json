@@ -1,0 +1,114 @@
+{
+  "Data Analysis": {
+    "projects": 11108,
+    "groups": {
+      "no_freelancer_selected": 8379,
+      "awarded": 2227,
+      "cancelled": 502
+    },
+    "pct_no_freelancer_of_finished": 75.4,
+    "pct_no_freelancer_of_all": 75.4,
+    "pct_awarded_of_finished": 20.0,
+    "pct_cancelled_of_finished": 4.5,
+    "monthly": {
+      "2026-01": {
+        "no_freelancer_selected": 1688,
+        "awarded": 396,
+        "cancelled": 80
+      },
+      "2026-02": {
+        "no_freelancer_selected": 1494,
+        "awarded": 379,
+        "cancelled": 99
+      },
+      "2026-03": {
+        "no_freelancer_selected": 1398,
+        "awarded": 426,
+        "cancelled": 81
+      },
+      "2026-04": {
+        "awarded": 410,
+        "no_freelancer_selected": 1326,
+        "cancelled": 90
+      },
+      "2026-05": {
+        "no_freelancer_selected": 1229,
+        "awarded": 321,
+        "cancelled": 76
+      },
+      "2026-06": {
+        "no_freelancer_selected": 1244,
+        "awarded": 295,
+        "cancelled": 76
+      }
+    },
+    "by_type": {
+      "fixed": {
+        "no_freelancer_selected": 5908,
+        "awarded": 1971,
+        "cancelled": 269
+      },
+      "hourly": {
+        "no_freelancer_selected": 2471,
+        "awarded": 256,
+        "cancelled": 233
+      }
+    }
+  },
+  "Graphic Design": {
+    "projects": 55140,
+    "groups": {
+      "no_freelancer_selected": 36036,
+      "awarded": 16775,
+      "cancelled": 2329
+    },
+    "pct_no_freelancer_of_finished": 65.4,
+    "pct_no_freelancer_of_all": 65.4,
+    "pct_awarded_of_finished": 30.4,
+    "pct_cancelled_of_finished": 4.2,
+    "monthly": {
+      "2026-01": {
+        "no_freelancer_selected": 7433,
+        "awarded": 3105,
+        "cancelled": 454
+      },
+      "2026-02": {
+        "no_freelancer_selected": 6207,
+        "awarded": 2857,
+        "cancelled": 435
+      },
+      "2026-03": {
+        "no_freelancer_selected": 5928,
+        "awarded": 3062,
+        "cancelled": 367
+      },
+      "2026-04": {
+        "no_freelancer_selected": 5775,
+        "cancelled": 390,
+        "awarded": 2736
+      },
+      "2026-05": {
+        "awarded": 2573,
+        "no_freelancer_selected": 5566,
+        "cancelled": 349
+      },
+      "2026-06": {
+        "awarded": 2442,
+        "no_freelancer_selected": 5127,
+        "cancelled": 334
+      }
+    },
+    "by_type": {
+      "fixed": {
+        "no_freelancer_selected": 28751,
+        "awarded": 15858,
+        "cancelled": 1371
+      },
+      "hourly": {
+        "no_freelancer_selected": 7285,
+        "awarded": 917,
+        "cancelled": 958
+      }
+    }
+  }
+}
