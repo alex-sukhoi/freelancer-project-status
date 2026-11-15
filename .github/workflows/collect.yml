@@ -9,8 +9,6 @@ on:
       end:
         description: "End date (YYYY-MM-DD, empty = yesterday)"
         default: ""
-  schedule:
-    - cron: "17 3 * * 1"   # every Monday 03:17 UTC
 
 permissions:
   contents: write
