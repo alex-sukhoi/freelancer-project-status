@@ -39,7 +39,7 @@ Find other job ids at
 
 ## Run on GitHub
 
-The workflow in `.github/workflows/collect.yml` runs every Monday and on demand
+The workflow in `.github/workflows/collect.yml` runs only when started by hand
 (**Actions → Collect Freelancer.com project statuses → Run workflow**). It commits the refreshed
 `data/` and `RESULTS.md` back to the repo. In *Settings → Actions → General → Workflow permissions*
 choose **Read and write permissions** so the commit step can push.
