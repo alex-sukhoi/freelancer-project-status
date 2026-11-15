@@ -1,0 +1,145 @@
+{
+  "start": "2026-01-01",
+  "end": "2026-11-14",
+  "categories": {
+    "data_analysis": {
+      "projects": 17369,
+      "groups": {
+        "cancelled": 726,
+        "awarded": 4283,
+        "no_freelancer_selected": 12177,
+        "still_open": 183
+      },
+      "pct_no_freelancer_of_all": 70.11,
+      "pct_no_freelancer_of_finished": 70.85,
+      "pct_awarded_of_finished": 24.92,
+      "monthly": {
+        "2026-01": {
+          "cancelled": 80,
+          "awarded": 396,
+          "no_freelancer_selected": 1688
+        },
+        "2026-02": {
+          "no_freelancer_selected": 1494,
+          "awarded": 379,
+          "cancelled": 99
+        },
+        "2026-03": {
+          "no_freelancer_selected": 1398,
+          "awarded": 426,
+          "cancelled": 81
+        },
+        "2026-04": {
+          "awarded": 410,
+          "no_freelancer_selected": 1326,
+          "cancelled": 90
+        },
+        "2026-05": {
+          "no_freelancer_selected": 1229,
+          "awarded": 321,
+          "cancelled": 76
+        },
+        "2026-06": {
+          "no_freelancer_selected": 1244,
+          "awarded": 295,
+          "cancelled": 76
+        },
+        "2026-07": {
+          "no_freelancer_selected": 1156,
+          "awarded": 304,
+          "cancelled": 41
+        },
+        "2026-08": {
+          "no_freelancer_selected": 1198,
+          "awarded": 287,
+          "cancelled": 66
+        },
+        "2026-09": {
+          "no_freelancer_selected": 1119,
+          "awarded": 253,
+          "cancelled": 52
+        },
+        "2026-10": {
+          "no_freelancer_selected": 325,
+          "cancelled": 51,
+          "awarded": 934
+        },
+        "2026-11": {
+          "awarded": 278,
+          "cancelled": 14,
+          "still_open": 183
+        }
+      }
+    },
+    "graphic_design": {
+      "projects": 82802,
+      "groups": {
+        "awarded": 28637,
+        "no_freelancer_selected": 50114,
+        "cancelled": 3449,
+        "still_open": 602
+      },
+      "pct_no_freelancer_of_all": 60.52,
+      "pct_no_freelancer_of_finished": 60.97,
+      "pct_awarded_of_finished": 34.84,
+      "monthly": {
+        "2026-01": {
+          "awarded": 3105,
+          "no_freelancer_selected": 7433,
+          "cancelled": 454
+        },
+        "2026-02": {
+          "no_freelancer_selected": 6207,
+          "awarded": 2857,
+          "cancelled": 435
+        },
+        "2026-03": {
+          "no_freelancer_selected": 5928,
+          "cancelled": 367,
+          "awarded": 3062
+        },
+        "2026-04": {
+          "awarded": 2736,
+          "no_freelancer_selected": 5774,
+          "cancelled": 390
+        },
+        "2026-05": {
+          "no_freelancer_selected": 5566,
+          "cancelled": 349,
+          "awarded": 2573
+        },
+        "2026-06": {
+          "awarded": 2442,
+          "no_freelancer_selected": 5127,
+          "cancelled": 334
+        },
+        "2026-07": {
+          "awarded": 2504,
+          "no_freelancer_selected": 5048,
+          "cancelled": 347
+        },
+        "2026-08": {
+          "no_freelancer_selected": 4323,
+          "awarded": 2147,
+          "cancelled": 298
+        },
+        "2026-09": {
+          "awarded": 1942,
+          "no_freelancer_selected": 3695,
+          "cancelled": 245,
+          "still_open": 1
+        },
+        "2026-10": {
+          "no_freelancer_selected": 1013,
+          "awarded": 3857,
+          "cancelled": 179
+        },
+        "2026-11": {
+          "awarded": 1412,
+          "cancelled": 51,
+          "still_open": 601
+        }
+      }
+    }
+  }
+}
