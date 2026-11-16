@@ -50,3 +50,10 @@ choose **Read and write permissions** so the commit step can push.
 - A project tagged with both categories counts in both.
 - Recent projects are often still open, so look at the "of finished" figure, and treat the last
   month or two as provisional.
+
+## Author
+
+Oleksii Sukhoi — freelance data analyst and researcher (R, Python, SPSS, SQL).
+[LinkedIn](https://www.linkedin.com/in/oleksii-sukhoi-4b60161a7) · [GitHub](https://github.com/alex-sukhoi)
+
+Questions, corrections, or data for other platforms are welcome — open an issue or message me on LinkedIn.
